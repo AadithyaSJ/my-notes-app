@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "315645134975",
+    "project_id": "mynotes-aadithya",
+    "storage_bucket": "mynotes-aadithya.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:315645134975:android:585c3bd772e1c7978e974a",
+        "android_client_info": {
+          "package_name": "com.example.learningdart"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDeKoDcUObykVLBBYozYZcK87n6CSh9uE4"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
