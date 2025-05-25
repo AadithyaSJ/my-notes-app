@@ -6,6 +6,7 @@ import 'package:learningdart/views/notes_view.dart';
 import 'package:learningdart/views/register_view.dart';
 import 'package:learningdart/views/verify_email.dart';
 
+
 void main() {
   WidgetsFlutterBinding.ensureInitialized();
   runApp(
