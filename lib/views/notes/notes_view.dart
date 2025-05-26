@@ -1,4 +1,3 @@
-import 'dart:developer' as devtools show log;
 import 'package:flutter/material.dart';
 import 'package:learningdart/constants/routes.dart';
 import 'package:learningdart/enum/menu_action.dart';
@@ -6,37 +5,27 @@ import 'package:learningdart/services/auth/auth_service.dart';
 import 'package:learningdart/services/crud/notes_service.dart';
 
 class NotesView extends StatefulWidget {
-  const NotesView({super.key});
+  const NotesView({Key? key}) : super(key: key);
 
   @override
-  State<NotesView> createState() => _NotesViewState();
+  _NotesViewState createState() => _NotesViewState();
 }
 
 class _NotesViewState extends State<NotesView> {
-
   late final NotesService _notesService;
   String get userEmail => AuthService.firebase().currentUser!.email!;
 
   @override
   void initState() {
     _notesService = NotesService();
-    _notesService.open();
     super.initState();
-  }
-
-  @override
-  void dispose() {
-    _notesService.close();
-    super.dispose();
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('Your Notes'),
-        backgroundColor: Colors.blue,
-        foregroundColor: Colors.white,
+        title: const Text('Your Notes'),
         actions: [
           IconButton(
             onPressed: () {
@@ -44,27 +33,25 @@ class _NotesViewState extends State<NotesView> {
             },
             icon: const Icon(Icons.add),
           ),
-          PopupMenuButton(
+          PopupMenuButton<MenuAction>(
             onSelected: (value) async {
-              switch(value){
+              switch (value) {
                 case MenuAction.logout:
                   final shouldLogout = await showLogOutDialog(context);
-                  devtools.log(shouldLogout.toString());
-                  if(shouldLogout){
+                  if (shouldLogout) {
                     await AuthService.firebase().logOut();
                     Navigator.of(context).pushNamedAndRemoveUntil(
                       loginRoute,
-                      (route) => false,
+                      (_) => false,
                     );
                   }
-                  break;
               }
             },
             itemBuilder: (context) {
               return const [
                 PopupMenuItem<MenuAction>(
                   value: MenuAction.logout,
-                  child: Text('Logout'),
+                  child: Text('Log out'),
                 ),
               ];
             },
@@ -73,18 +60,43 @@ class _NotesViewState extends State<NotesView> {
       ),
       body: FutureBuilder(
         future: _notesService.getOrCreateUser(email: userEmail),
-        builder:(context, snapshot) {
-          switch(snapshot.connectionState){
-            case ConnectionState.waiting:
-              return const Text('Loading...');
-            case ConnectionState.active:
-              return const Text('Awaiting all notes');
+        builder: (context, snapshot) {
+          switch (snapshot.connectionState) {
             case ConnectionState.done:
-              return const Text('Your notes will appear here');
+              return StreamBuilder(
+                stream: _notesService.allNotes,
+                builder: (context, snapshot) {
+                  switch (snapshot.connectionState) {
+                    case ConnectionState.waiting:
+                    case ConnectionState.active:
+                      if (snapshot.hasData) {
+                        final allNotes = snapshot.data as List<DatabaseNote>;
+                        return ListView.builder(
+                          itemCount: allNotes.length,
+                          itemBuilder: (context, index) {
+                            final note = allNotes[index];
+                            return ListTile(
+                              title: Text(
+                                note.text,
+                                maxLines: 1,
+                                softWrap: true,
+                                overflow: TextOverflow.ellipsis,
+                              ),
+                            );
+                          },
+                        );
+                      } else {
+                        return const CircularProgressIndicator();
+                      }
+                    default:
+                      return const CircularProgressIndicator();
+                  }
+                },
+              );
             default:
               return const CircularProgressIndicator();
           }
-        }
+        },
       ),
     );
   }
@@ -95,8 +107,8 @@ Future<bool> showLogOutDialog(BuildContext context) {
     context: context,
     builder: (context) {
       return AlertDialog(
-        title: const Text('Logout'),
-        content: const Text('Are you sure you want to logout?'),
+        title: const Text('Sign out'),
+        content: const Text('Are you sure you want to sign out?'),
         actions: [
           TextButton(
             onPressed: () {
@@ -108,10 +120,10 @@ Future<bool> showLogOutDialog(BuildContext context) {
             onPressed: () {
               Navigator.of(context).pop(true);
             },
-            child: const Text('Logout'),
+            child: const Text('Log out'),
           ),
         ],
       );
-    }
-  ).then((value)=> value ?? false);
+    },
+  ).then((value) => value ?? false);
 }
