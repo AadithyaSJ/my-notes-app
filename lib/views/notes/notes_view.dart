@@ -75,6 +75,10 @@ class _NotesViewState extends State<NotesView> {
         future: _notesService.getOrCreateUser(email: userEmail),
         builder:(context, snapshot) {
           switch(snapshot.connectionState){
+            case ConnectionState.waiting:
+              return const Text('Loading...');
+            case ConnectionState.active:
+              return const Text('Awaiting all notes');
             case ConnectionState.done:
               return const Text('Your notes will appear here');
             default:
