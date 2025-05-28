@@ -69,7 +69,7 @@ class _RegisterViewState extends State<RegisterView> {
                 );
                 AuthService.firebase().sendEmailVerification();
                 Navigator.of(context).pushNamed(
-                  VerifyEmailRoute
+                  verifyEmailRoute
                 );
               } on WeekPasswordAuthException {
                 await showErrorDialog(
